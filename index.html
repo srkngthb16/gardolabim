@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Gardolabım" />
+  <title>Gardolabım</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --border: rgba(0,0,0,0.09);
+      --border-hover: rgba(0,0,0,0.18);
+      --text: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --text-tertiary: #ababab;
+      --clean: #4caf50;
+      --dirty: #e05252;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --tab-active-bg: #1a1a1a;
+      --tab-active-text: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111111;
+        --surface: #1e1e1e;
+        --border: rgba(255,255,255,0.09);
+        --border-hover: rgba(255,255,255,0.2);
+        --text: #f0f0f0;
+        --text-secondary: #999;
+        --text-tertiary: #555;
+        --tab-active-bg: #f0f0f0;
+        --tab-active-text: #111111;
+      }
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overscroll-behavior: none;
+    }
+
+    .app {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 6rem;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .header-title h1 {
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -0.6px;
+      color: var(--text);
+    }
+    .header-title p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* TABS */
+    .tabs-outer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+    }
+    .tabs-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      flex: 1;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .tabs-scroll::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 7px 15px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab:hover { border-color: var(--border-hover); color: var(--text); }
+    .tab.active {
+      background: var(--tab-active-bg);
+      color: var(--tab-active-text);
+      border-color: var(--tab-active-bg);
+    }
+    .btn-icon {
+      flex-shrink: 0;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-icon:hover { border-color: var(--border-hover); }
+
+    /* ACTIONS ROW */
+    .actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .cat-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .btn-add {
+      display: flex; align-items: center; gap: 5px;
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-add:hover { border-color: var(--border-hover); }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      transition: border-color .15s;
+    }
+    .card:hover { border-color: var(--border-hover); }
+    .card.dirty { border-color: rgba(224, 82, 82, 0.25); }
+
+    .card-img-wrap {
+      position: relative;
+      aspect-ratio: 3/4;
+      background: var(--bg);
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .card.dirty .card-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(224,82,82,0.08);
+    }
+    .card-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .card-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+      color: var(--text-tertiary);
+      font-size: 11px;
+    }
+    .card-placeholder svg { width: 30px; height: 30px; }
+    .card-photo-hint {
+      position: absolute;
+      bottom: 6px; right: 6px;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: .15s;
+      pointer-events: none;
+    }
+    .card-img-wrap:hover .card-photo-hint { opacity: 1; }
+
+    .card-delete {
+      position: absolute;
+      top: 7px; right: 7px;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: .15s;
+      z-index: 3;
+    }
+    .card:hover .card-delete { opacity: 1; }
+    .card-delete:hover { background: rgba(200,0,0,.75); }
+
+    .card-body {
+      padding: 10px 12px 12px;
+    }
+    .card-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .toggle-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      transition: color .2s;
+    }
+    .card.dirty .toggle-label { color: var(--dirty); }
+    .card:not(.dirty) .toggle-label { color: var(--clean); }
+
+    /* iOS-style toggle */
+    .toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider-t {
+      position: absolute; inset: 0;
+      background: #ddd;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .25s cubic-bezier(.4,0,.2,1);
+    }
+    .slider-t::before {
+      content: '';
+      position: absolute;
+      height: 18px; width: 18px;
+      left: 3px; bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .25s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 1px 4px rgba(0,0,0,.25);
+    }
+    input:checked + .slider-t { background: var(--clean); }
+    input:checked + .slider-t::before { transform: translateX(18px); }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align: center;
+      padding: 3.5rem 1rem;
+      color: var(--text-tertiary);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* ADD CARD */
+    .add-card {
+      background: transparent;
+      border: 1px dashed var(--border-hover);
+      border-radius: var(--radius-lg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      min-height: 200px;
+      color: var(--text-tertiary);
+      font-size: 12px;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .add-card:hover { border-color: var(--text-secondary); color: var(--text-secondary); background: var(--surface); }
+    .add-card svg { width: 26px; height: 26px; }
+
+    /* STATS BAR */
+    .stats {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .stats::-webkit-scrollbar { display: none; }
+    .stat-group {
+      display: flex;
+      gap: 1.25rem;
+      flex-shrink: 0;
+    }
+    .stat-divider {
+      width: 1px;
+      background: var(--border);
+      margin: 0 1.25rem;
+      flex-shrink: 0;
+    }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-val { font-size: 22px; font-weight: 500; color: var(--text); }
+    .stat-lbl { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: .05em; }
+    .stat-clean .stat-val { color: var(--clean); }
+    .stat-dirty .stat-val { color: var(--dirty); }
+
+    /* MODAL */
+    .modal-bg {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+    .modal-bg.open { display: flex; }
+    @media(min-width:600px) {
+      .modal-bg { align-items: center; }
+      .modal { border-radius: var(--radius-lg) !important; max-width: 380px; }
+    }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .modal-handle {
+      width: 36px; height: 4px;
+      background: var(--border-hover);
+      border-radius: 2px;
+      margin: 0 auto 1.25rem;
+    }
+    .modal h2 {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 1.25rem;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .form-group input[type=text] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .form-group input[type=text]:focus { border-color: var(--border-hover); }
+    .file-upload {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px dashed var(--border-hover);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+    }
+    .modal-btns { display: flex; gap: 8px; margin-top: 1.25rem; }
+    .btn-primary {
+      flex: 1;
+      padding: 11px;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn-primary:hover { opacity: .85; }
+    .btn-cancel {
+      padding: 11px 18px;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    /* CAT LIST */
+    .cat-list { margin-top: .75rem; display: flex; flex-direction: column; gap: 6px; }
+    .cat-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--text);
+    }
+    .cat-rm {
+      border: none; background: transparent;
+      color: var(--text-tertiary);
+      font-size: 18px; line-height: 1;
+      cursor: pointer; padding: 0 4px;
+    }
+    .cat-rm:hover { color: var(--dirty); }
+
+    /* FILTER ROW */
+    .filter-row {
+      display: flex; gap: 6px;
+      margin-bottom: 1rem;
+    }
+    .filter-btn {
+      padding: 5px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .filter-btn:hover:not(.active) { border-color: var(--border-hover); color: var(--text); }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-title">
+      <h1>Gardolabım</h1>
+      <p>Kıyafetlerini yönet</p>
+    </div>
+    <button class="btn-icon" onclick="openCatModal()" title="Kategorileri düzenle">⋯</button>
+  </div>
+
+  <div class="tabs-outer">
+    <div class="tabs-scroll" id="tabsScroll"></div>
+  </div>
+
+  <div class="actions-row">
+    <span class="cat-label" id="catLabel"></span>
+    <button class="btn-add" onclick="openAddModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Kıyafet ekle
+    </button>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Hepsi</button>
+    <button class="filter-btn" data-filter="clean" onclick="setFilter('clean', this)">Temiz</button>
+    <button class="filter-btn" data-filter="dirty" onclick="setFilter('dirty', this)">Kirli</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="stats" id="statsBar"></div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal-bg" id="addModal" onclick="bgClick(event,'addModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Kıyafet ekle</h2>
+    <div class="form-group">
+      <label>Kıyafet adı</label>
+      <input type="text" id="itemName" placeholder="ör. Beyaz tişört" />
+    </div>
+    <div class="form-group">
+      <label>Fotoğraf (opsiyonel)</label>
+      <input type="file" id="itemPhoto" accept="image/*" class="file-upload" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('addModal')">İptal</button>
+      <button class="btn-primary" onclick="saveItem()">Ekle</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal-bg" id="catModal" onclick="bgClick(event,'catModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Kategoriler</h2>
+    <div class="form-group">
+      <label>Yeni kategori</label>
+      <input type="text" id="newCatName" placeholder="ör. Kazak" />
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:4px" onclick="addCategory()">Ekle</button>
+    <div class="cat-list" id="catList"></div>
+    <div class="modal-btns" style="margin-top:1.5rem">
+      <button class="btn-primary" onclick="closeModal('catModal')">Tamam</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'gardolap_v2';
+let activeFilter = 'all';
+let state = {
+  categories: ['Tişört','Pantolon','Gömlek','Çorap','Kazak','Mont','İç Çamaşır'],
+  active: 'Tişört',
+  items: {}
+};
+
+function load() {
+  try { const s = localStorage.getItem(KEY); if (s) state = JSON.parse(s); } catch(e) {}
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function render() { renderTabs(); renderGrid(); renderStats(); }
+
+function renderTabs() {
+  document.getElementById('tabsScroll').innerHTML =
+    state.categories.map(c =>
+      `<button class="tab${c===state.active?' active':''}" onclick="setTab('${esc(c)}')">${esc(c)}</button>`
+    ).join('');
+  document.getElementById('catLabel').textContent = state.active;
+}
+
+function renderGrid() {
+  const cat = state.active;
+  const all = state.items[cat] || [];
+  const items = all.filter(it => {
+    if (activeFilter === 'clean') return !it.dirty;
+    if (activeFilter === 'dirty') return it.dirty;
+    return true;
+  });
+  const realIdx = (filteredItem) => all.findIndex(x => x === filteredItem);
+
+  let html = '';
+  if (!all.length) {
+    html = `<div class="empty-state" style="grid-column:1/-1">Bu kategoride henüz kıyafet yok.<br>Sağ üstten ekleyebilirsin.</div>`;
+  } else if (!items.length) {
+    html = `<div class="empty-state" style="grid-column:1/-1">Bu filtreye uyan kıyafet yok.</div>`;
+  } else {
+    html = items.map(item => {
+      const i = realIdx(item);
+      const dirty = !!item.dirty;
+      const img = item.photo
+        ? `<img src="${item.photo}" alt="${esc(item.name)}" loading="lazy">`
+        : `<div class="card-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>
+            </svg>
+            <span>Fotoğraf yok</span>
+          </div>`;
+      return `<div class="card${dirty?' dirty':''}">
+        <button class="card-delete" onclick="deleteItem('${esc(cat)}',${i})">✕</button>
+        <div class="card-img-wrap" onclick="changePhoto('${esc(cat)}',${i})" title="Fotoğraf değiştir">
+          ${img}
+          <span class="card-photo-hint">fotoğraf değiştir</span>
+        </div>
+        <div class="card-body">
+          <div class="card-name">${esc(item.name)}</div>
+          <div class="toggle-row">
+            <span class="toggle-label">${dirty ? 'Kirli' : 'Temiz'}</span>
+            <label class="toggle">
+              <input type="checkbox" ${dirty?'':'checked'} onchange="toggleClean('${esc(cat)}',${i},this.checked)">
+              <span class="slider-t"></span>
+            </label>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  html += `<div class="add-card" onclick="openAddModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>Kıyafet ekle
+  </div>`;
+  document.getElementById('grid').innerHTML = html;
+}
+
+function renderStats() {
+  let total=0, clean=0, dirty=0;
+  Object.values(state.items).forEach(arr => arr.forEach(it => { total++; it.dirty?dirty++:clean++; }));
+  const cat = state.active;
+  const catArr = state.items[cat] || [];
+  const cTotal = catArr.length;
+  const cClean = catArr.filter(i=>!i.dirty).length;
+  const cDirty = catArr.filter(i=>i.dirty).length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-group">
+      <div class="stat"><span class="stat-val">${cTotal}</span><span class="stat-lbl">${state.active}</span></div>
+      <div class="stat stat-clean"><span class="stat-val">${cClean}</span><span class="stat-lbl">Temiz</span></div>
+      <div class="stat stat-dirty"><span class="stat-val">${cDirty}</span><span class="stat-lbl">Kirli</span></div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-group">
+      <div class="stat"><span class="stat-val">${total}</span><span class="stat-lbl">Toplam</span></div>
+      <div class="stat stat-clean"><span class="stat-val">${clean}</span><span class="stat-lbl">Temiz</span></div>
+      <div class="stat stat-dirty"><span class="stat-val">${dirty}</span><span class="stat-lbl">Kirli</span></div>
+    </div>`;
+}
+
+function setTab(cat) { state.active = cat; save(); render(); }
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+function toggleClean(cat, i, isClean) {
+  state.items[cat][i].dirty = !isClean;
+  save(); render();
+}
+function deleteItem(cat, i) {
+  if (!confirm(`"${state.items[cat][i].name}" silinsin mi?`)) return;
+  state.items[cat].splice(i, 1);
+  save(); render();
+}
+function changePhoto(cat, i) {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    resizeAndSave(file, data => { state.items[cat][i].photo = data; save(); render(); });
+  };
+  inp.click();
+}
+
+function openAddModal() { document.getElementById('addModal').classList.add('open'); document.getElementById('itemName').focus(); }
+function openCatModal() { document.getElementById('catModal').classList.add('open'); renderCatList(); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function bgClick(e, id) { if (e.target.classList.contains('modal-bg')) closeModal(id); }
+
+function saveItem() {
+  const name = document.getElementById('itemName').value.trim();
+  if (!name) { document.getElementById('itemName').focus(); return; }
+  const cat = state.active;
+  if (!state.items[cat]) state.items[cat] = [];
+  const file = document.getElementById('itemPhoto').files[0];
+  const finish = (photo) => {
+    state.items[cat].push({ name, photo: photo || null, dirty: false });
+    save(); render();
+    document.getElementById('itemName').value = '';
+    document.getElementById('itemPhoto').value = '';
+    closeModal('addModal');
+  };
+  if (file) { resizeAndSave(file, finish); } else { finish(null); }
+}
+
+function resizeAndSave(file, cb) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const max = 600;
+      let w = img.width, h = img.height;
+      if (w > max || h > max) {
+        if (w > h) { h = Math.round(h * max / w); w = max; }
+        else { w = Math.round(w * max / h); h = max; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', 0.75));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderCatList() {
+  document.getElementById('catList').innerHTML =
+    state.categories.map((c, i) =>
+      `<div class="cat-item">${esc(c)}<button class="cat-rm" onclick="removeCategory(${i})">×</button></div>`
+    ).join('');
+}
+function addCategory() {
+  const inp = document.getElementById('newCatName');
+  const name = inp.value.trim();
+  if (!name || state.categories.includes(name)) return;
+  state.categories.push(name);
+  inp.value = '';
+  save(); renderCatList(); renderTabs();
+}
+function removeCategory(i) {
+  const cat = state.categories[i];
+  if (!confirm(`"${cat}" kategorisini ve kıyafetlerini sil?`)) return;
+  state.categories.splice(i, 1);
+  delete state.items[cat];
+  if (state.active === cat) state.active = state.categories[0] || '';
+  save(); renderCatList(); render();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
+  if (e.key === 'Enter') {
+    if (document.getElementById('addModal').classList.contains('open')) saveItem();
+    if (document.getElementById('catModal').classList.contains('open')) addCategory();
+  }
+});
+
+load();
+if (!state.categories.length) state.categories = ['Tişört', 'Pantolon'];
+if (!state.active || !state.categories.includes(state.active)) state.active = state.categories[0];
+render();
+</script>
+</body>
+</html>
